@@ -1,59 +1,63 @@
 package com.practica1.practica1.controller;
 
-import com.practica1.practica1.model.Producto;
-import com.practica1.practica1.service.ProductoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import com.practica1.practica1.model.Producto;
+import com.practica1.practica1.service.CartService;
+import com.practica1.practica1.service.ProductoService;
 
 @Controller
-@SessionAttributes("cartItems")
+@RequestMapping("/cart")
 public class CartController {
 
     private final ProductoService productService;
+    private final CartService cartService;
 
-    public CartController(ProductoService productService) {
+    public CartController(ProductoService productService, CartService cartService) {
         this.productService = productService;
+        this.cartService = cartService;
     }
 
-    @ModelAttribute("cartItems")
-    public List<Producto> cartItems() {
-        return new ArrayList<>();
-    }
-
-    @GetMapping("/cart")
+    @GetMapping
     public String cart(Model model) {
+        model.addAttribute("cartItems", cartService.getItems());
+        model.addAttribute("total", cartService.getTotal());
         return "cart";
     }
 
-    @PostMapping("/cart/add/{id}")
+    @PostMapping("/add/{id}")
     public String addToCart(@PathVariable("id") Long id,
-            @ModelAttribute("cartItems") List<Producto> cartItems,
+            @RequestParam(name = "qty", defaultValue = "1") int qty,
             RedirectAttributes ra) {
-        Producto p = productService.getProductById(id); // o getProductById(id)
+
+        Producto p = productService.getProductById(id);
         if (p != null) {
-            cartItems.add(p);
+            cartService.add(p, Math.max(1, qty));
             ra.addFlashAttribute("msg", "Añadido al carrito");
+        } else {
+            ra.addFlashAttribute("error", "Producto no encontrado");
         }
         return "redirect:/cart";
     }
 
-    @PostMapping("/cart/remove/{id}")
-    public String removeFromCart(@PathVariable("id") Long id,
-            @ModelAttribute("cartItems") List<Producto> cartItems,
-            RedirectAttributes ra) {
-        for (Iterator<Producto> it = cartItems.iterator(); it.hasNext();) {
-            if (it.next().getId().equals(id)) {
-                it.remove();
-                break;
-            }
-        }
+    @PostMapping("/remove/{id}")
+    public String removeFromCart(@PathVariable("id") Long id, RedirectAttributes ra) {
+        cartService.remove(id);
         ra.addFlashAttribute("msg", "Eliminado del carrito");
+        return "redirect:/cart";
+    }
+
+    @PostMapping("/clear")
+    public String clearCart(RedirectAttributes ra) {
+        cartService.clear();
+        ra.addFlashAttribute("msg", "Carrito vaciado");
         return "redirect:/cart";
     }
 }
