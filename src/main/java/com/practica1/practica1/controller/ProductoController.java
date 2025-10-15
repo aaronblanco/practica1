@@ -1,11 +1,16 @@
 package com.practica1.practica1.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.practica1.practica1.model.Producto;
 import com.practica1.practica1.service.ProductoService;
 
@@ -17,9 +22,15 @@ public class ProductoController {
     private ProductoService productService;
 
     @GetMapping
-    public String getProductsPage(Model model) {
-        model.addAttribute("products", productService.getAllProducts());
-        return "products"; // Devuelve products.html desde las plantillas
+    public String getProductsPage(Model model, @RequestParam(value = "search", required = false) String keyword) {
+        List<Producto> products;
+        if (keyword != null && !keyword.isEmpty()) {
+            products = productService.searchProducts(keyword);
+        } else {
+            products = productService.getAllProducts();
+        }
+        model.addAttribute("products", products);
+        return "products";
     }
 
     @GetMapping("/add")
@@ -53,4 +64,5 @@ public class ProductoController {
         productService.deleteProduct(id);
         return "redirect:/admin";  // Redirigir correctamente a /admin
     }
+
 }

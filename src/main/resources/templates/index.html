@@ -14,7 +14,15 @@
             <a href="/cart" class="btn btn-secondary btn-lg me-3">Ver Carrito</a>
             <a href="/admin" class="btn btn-warning btn-lg">Administrar Productos</a>
         </div>
-
+        <!-- Barra de búsqueda -->
+        <div class="row mb-4">
+            <div class="col-md-6 mx-auto">
+                <form th:action="@{/products}" method="get" class="d-flex">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Buscar producto...">
+                    <button type="submit" class="btn btn-primary">Buscar</button>
+                </form>
+            </div>
+        </div>
         <!-- Sección de Noticias -->
         <div class="row">
             <div class="col-md-12">
