@@ -2,10 +2,8 @@ package com.practica1.practica1.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,38 +16,52 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    // 1. Define el codificador de contraseñas como un Bean
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                .requestMatchers("/", "/index", "/index.html", "/login",
-                        "/css/**", "/js/**", "/images/**", "/webjars/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/products", "/products/**", "/cart", "/cart/**").permitAll()
-                .requestMatchers("/api/**").permitAll() // si queremos API sea pública
-                .requestMatchers(HttpMethod.POST, "/cart/**").permitAll()
-                .requestMatchers("/admin/**",
-                        "/products/add", "/products/edit/**", "/products/delete/**").hasRole("ADMIN")
-                .anyRequest().authenticated()
-                )
-                .formLogin(form -> form.loginPage("/login").permitAll())
-                .logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/").permitAll())
-                // En desarrollo, ignora CSRF en endpoints POST que usas en formularios
-                .csrf(csrf -> csrf.ignoringRequestMatchers(
-                "/cart/**", "/products/add", "/products/edit/**", "/products/delete/**"));
-        return http.build();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
+    // 2. Define tus usuarios usando el PasswordEncoder
     @Bean
-    WebSecurityCustomizer ignoringCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/h2-console/**");
-    }
+    public UserDetailsService userDetailsService() {
+        UserDetails admin = User.builder()
+                .username("admin")
+                .password(passwordEncoder().encode("admin"))
+                .roles("ADMIN")
+                .build();
 
-    public UserDetailsService users() {
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin").password("admin").roles("ADMIN").build();
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user").password("user").roles("USER").build();
+        UserDetails user = User.builder()
+                .username("user")
+                .password(passwordEncoder().encode("user"))
+                .roles("USER")
+                .build();
+
         return new InMemoryUserDetailsManager(admin, user);
     }
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/", "/index", "/css/**", "/images/**").permitAll()
+                .requestMatchers("/products", "/cart/**").permitAll()
+                .requestMatchers("/admin/**", "/products/add", "/products/edit/**", "/products/delete/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/admin", true)
+                .permitAll()
+                )
+                .logout(logout -> logout
+                .logoutSuccessUrl("/")
+                .permitAll()
+                );
+
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+
+        return http.build();
+    }
 }
