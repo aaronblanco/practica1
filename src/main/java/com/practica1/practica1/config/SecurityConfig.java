@@ -16,13 +16,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    // 1. Define el codificador de contraseñas como un Bean
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 2. Define tus usuarios usando el PasswordEncoder
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails admin = User.builder()

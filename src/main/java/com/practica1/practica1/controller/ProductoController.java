@@ -22,10 +22,14 @@ public class ProductoController {
     private ProductoService productService;
 
     @GetMapping
-    public String getProductsPage(Model model, @RequestParam(value = "search", required = false) String keyword) {
+    public String getProductsPage(Model model, @RequestParam(value = "search", required = false) String keyword,
+            @RequestParam(required = false) Double minPrice,
+            @RequestParam(required = false) Double maxPrice) {
         List<Producto> products;
         if (keyword != null && !keyword.isEmpty()) {
             products = productService.searchProducts(keyword);
+        } else if (minPrice != null && maxPrice != null) {
+            products = productService.filterProducts(keyword, minPrice, maxPrice);
         } else {
             products = productService.getAllProducts();
         }
@@ -36,7 +40,7 @@ public class ProductoController {
     @GetMapping("/add")
     public String showAddForm(Model model) {
         model.addAttribute("product", new Producto());
-        return "product_form"; // templates/product_form.html
+        return "product_form";
     }
 
     @PostMapping("/add")
@@ -45,7 +49,7 @@ public class ProductoController {
         product.setName(name);
         product.setPrice(price);
         productService.saveProduct(product);
-        return "redirect:/admin";  // Redirigir correctamente a /admin
+        return "redirect:/admin";
     }
 
     @PostMapping("/edit/{id}")
@@ -56,13 +60,13 @@ public class ProductoController {
             product.setPrice(price);
             productService.saveProduct(product);
         }
-        return "redirect:/admin";  // Redirigir correctamente a /admin
+        return "redirect:/admin";
     }
 
     @PostMapping("/delete/{id}")
     public String deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
-        return "redirect:/admin";  // Redirigir correctamente a /admin
+        return "redirect:/admin";
     }
 
 }

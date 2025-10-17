@@ -34,4 +34,13 @@ public class ProductoService {
         return productRepo.findByNameContainingIgnoreCase(keyword);
     }
 
+    public List<Producto> filterProducts(String search, Double minPrice, Double maxPrice) {
+        if (search != null && !search.isEmpty()) {
+            return productRepo.findByNameContainingIgnoreCase(search);
+        }
+        if (minPrice != null && maxPrice != null) {
+            return productRepo.findByPriceBetween(minPrice, maxPrice);
+        }
+        return productRepo.findAll();
+    }
 }

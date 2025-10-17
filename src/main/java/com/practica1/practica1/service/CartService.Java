@@ -1,10 +1,5 @@
 package com.practica1.practica1.service;
 
-import com.practica1.practica1.model.CartModel;
-import com.practica1.practica1.model.Producto;
-import org.springframework.stereotype.Service;
-import org.springframework.web.context.annotation.SessionScope;
-
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -12,14 +7,22 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.SessionScope;
+
+import com.practica1.practica1.model.CartModel;
+import com.practica1.practica1.model.Producto;
+
 @Service
-@SessionScope // Un carrito por usuario/sesión
+@SessionScope
 public class CartService implements Serializable {
 
     private final Map<Long, CartModel> items = new LinkedHashMap<>();
 
     public void add(Producto p, int qty) {
-        if (p == null) return;
+        if (p == null) {
+            return;
+        }
         int toAdd = Math.max(1, qty);
 
         Long id = p.getId();
@@ -38,11 +41,9 @@ public class CartService implements Serializable {
         items.remove(productId);
     }
 
-
     public Collection<CartModel> getItems() {
         return Collections.unmodifiableCollection(items.values());
     }
-
 
     public BigDecimal getTotal() {
         return items.values().stream()

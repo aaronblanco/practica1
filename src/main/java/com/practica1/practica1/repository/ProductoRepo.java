@@ -9,4 +9,6 @@ import com.practica1.practica1.model.Producto;
 public interface ProductoRepo extends JpaRepository<Producto, Long> {
 
     List<Producto> findByNameContainingIgnoreCase(String keyword);
+
+    List<Producto> findByPriceBetween(double minPrice, double maxPrice);
 }
