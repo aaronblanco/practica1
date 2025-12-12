@@ -12,12 +12,4 @@ public class ViewController {
         return "index";     // templates/index.html
     }
 
-    // @GetMapping("/admin")
-    // public String admin(Model model) {
-    //     return "admin";     // templates/admin.html
-    // }
-    //  @GetMapping("/login")
-    //  public String login() {
-    //   return "login";     // templates/login.html
-    //  }
 }

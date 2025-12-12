@@ -44,6 +44,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/", "/index", "/css/**", "/images/**").permitAll()
                 .requestMatchers("/products", "/cart/**").permitAll()
+                .requestMatchers("/products/api/**").permitAll()
+                .requestMatchers("/api/products/**").permitAll()
                 .requestMatchers("/admin/**", "/products/add", "/products/edit/**", "/products/delete/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
@@ -55,9 +57,20 @@ public class SecurityConfig {
                 .logout(logout -> logout
                 .logoutSuccessUrl("/")
                 .permitAll()
+                )
+                .exceptionHandling(exception -> exception
+                .authenticationEntryPoint((request, response, authException) -> {
+                    if (request.getRequestURI().startsWith("/api/") || request.getRequestURI().startsWith("/products/api")) {
+                        response.setStatus(401);
+                        response.setContentType("application/json;charset=UTF-8");
+                        response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                    } else {
+                        response.sendRedirect("/login");
+                    }
+                })
                 );
 
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**", "/products/api/**", "/login"));
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();

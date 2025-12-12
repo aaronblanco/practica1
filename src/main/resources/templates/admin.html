@@ -30,8 +30,6 @@
                         <form th:action="${product.id == null} ? @{/products/add} : @{/products/edit/{id}(id=${product.id})}"
                               th:object="${product}" method="post">
                             
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                            
                             <div class="mb-3">
                                 <label for="name" class="form-label">Nombre del Producto</label>
                                 <input type="text" id="name" th:field="*{name}" class="form-control" required>
