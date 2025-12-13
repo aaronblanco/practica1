@@ -13,7 +13,11 @@
             <div class="d-flex">
                 <a href="/products" class="btn btn-secondary me-2">Ver Catálogo de Productos</a>
                 <a href="/cart" class="btn btn-secondary me-2">Ver Carrito</a>
-                <a href="/admin/download-db-sql" class="btn btn-primary">Descargar Base de Datos (SQL)</a>
+                <a href="/admin/download-db-sql" class="btn btn-primary me-2">Descargar Base de Datos (SQL)</a>
+                <form th:action="@{/logout}" method="post" class="d-inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+                </form>
             </div>
         </nav>
 
@@ -57,9 +61,12 @@
                     <ul class="list-group list-group-flush">
                         <li th:each="p : ${products}" class="list-group-item">
                             <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong th:text="${p.name}">Nombre</strong>
-                                    <p class="mb-0 text-muted" th:text="'$' + ${p.price}">Precio</p>
+                                <div class="d-flex align-items-center">
+                                    <img th:src="${p.imageUrl}" alt="Imagen del producto" style="width: 50px; height: 50px; object-fit: cover; margin-right: 10px;">
+                                    <div>
+                                        <strong th:text="${p.name}">Nombre</strong>
+                                        <p class="mb-0 text-muted" th:text="'$' + ${p.price}">Precio</p>
+                                    </div>
                                 </div>
                                 <div>
                                     <a th:href="@{/admin/edit/{id}(id=${p.id})}" class="btn btn-warning btn-sm">Editar</a>

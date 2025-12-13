@@ -43,9 +43,9 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers("/", "/index", "/css/**", "/images/**").permitAll()
-                .requestMatchers("/products", "/cart/**").permitAll()
-                .requestMatchers("/products/api/**").permitAll()
+                .requestMatchers("/products", "/api/products/**", "/cart/**").permitAll()
                 .requestMatchers("/api/products/**").permitAll()
+                .requestMatchers("/api/**").permitAll()
                 .requestMatchers("/admin/**", "/products/add", "/products/edit/**", "/products/delete/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
@@ -60,7 +60,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, authException) -> {
-                    if (request.getRequestURI().startsWith("/api/") || request.getRequestURI().startsWith("/products/api")) {
+                    if (request.getRequestURI().startsWith("/api/") || request.getRequestURI().startsWith("/api/products")) {
                         response.setStatus(401);
                         response.setContentType("application/json;charset=UTF-8");
                         response.getWriter().write("{\"error\": \"Unauthorized\"}");

@@ -1,5 +1,6 @@
 package com.practica1.practica1.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.practica1.practica1.model.Producto;
@@ -59,5 +61,26 @@ public class CartController {
         cartService.clear();
         ra.addFlashAttribute("msg", "Carrito vaciado");
         return "redirect:/cart";
+    }
+
+    @PostMapping("/checkout")
+    public String checkout(RedirectAttributes ra) {
+        if (cartService.getItems().isEmpty()) {
+            ra.addFlashAttribute("error", "No se ha podido tramitar porque no tienes nada en el carrito");
+            return "redirect:/cart";
+        }
+        cartService.clear();
+        ra.addFlashAttribute("msg", "Pedido realizado correctamente");
+        return "redirect:/products";
+    }
+
+    @PostMapping("/api/checkout")
+    @ResponseBody
+    public ResponseEntity<String> apiCheckout() {
+        if (cartService.getItems().isEmpty()) {
+            return ResponseEntity.badRequest().body("{\"error\": \"No se ha podido tramitar porque no tienes nada en el carrito\"}");
+        }
+        cartService.clear();
+        return ResponseEntity.ok("{\"message\": \"Pedido realizado correctamente\"}");
     }
 }

@@ -1,16 +1,15 @@
 package com.practica1.practica1.model;
 
+import java.util.Objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
-import java.util.Objects;
-
-import jakarta.persistence.Column;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "producto")
@@ -26,6 +25,8 @@ public class Producto {
     private String name;
     @Column(name = "precio")
     private double price;
+    @Column(name = "imagen")
+    private String imageUrl;
 
     // Getters y Setters
     public Long getId() {
@@ -67,5 +68,13 @@ public class Producto {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }
