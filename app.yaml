@@ -1,0 +1,16 @@
+name: practica1
+services:
+- name: app
+  github:
+    repo: aaronblanco/practica1
+    branch: main
+  build_command: ./mvnw clean package -DskipTests
+  run_command: java -Dserver.port=${PORT:-8080} -jar target/*.war
+  http_port: 8080
+  health_check:
+    http_path: /products
+  envs:
+  - key: SPRING_PROFILES_ACTIVE
+    value: production
+  - key: JAVA_OPTS
+    value: -Xmx512m -Xms256m

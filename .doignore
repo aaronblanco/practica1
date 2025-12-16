@@ -1,0 +1,12 @@
+.git
+target/
+.mvn/
+*.log
+.DS_Store
+.classpath
+.project
+.settings/
+.vscode/
+*.swp
+*.swo
+node_modules/

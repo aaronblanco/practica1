@@ -1,5 +1,6 @@
 package com.practica1.practica1.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${app.security.admin-username:admin}")
+    private String adminUsername;
+
+    @Value("${app.security.admin-password:ChangeMe123!}")
+    private String adminPassword;
+
+    @Value("${app.security.user-username:user}")
+    private String userUsername;
+
+    @Value("${app.security.user-password:UserPass123!}")
+    private String userPassword;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -26,14 +39,14 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("admin"))
+                .username(adminUsername)
+                .password(passwordEncoder().encode(adminPassword))
                 .roles("ADMIN")
                 .build();
 
         UserDetails user = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("user"))
+                .username(userUsername)
+                .password(passwordEncoder().encode(userPassword))
                 .roles("USER")
                 .build();
 
