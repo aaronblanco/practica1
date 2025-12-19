@@ -1,15 +1,20 @@
 package com.practica1.practica1.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class AuthController {
@@ -27,18 +32,29 @@ public class AuthController {
 
     @PostMapping("/api/login")
     @ResponseBody
-    public ResponseEntity<String> apiLogin(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<String> apiLogin(@RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
             );
             if (authentication.isAuthenticated()) {
-                return ResponseEntity.ok("{\"message\": \"Login successful\"}");
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                request.getSession(true).setAttribute(
+                        HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                        SecurityContextHolder.getContext());
+
+                return ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"message\": \"Login successful\"}");
             } else {
-                return ResponseEntity.status(401).body("{\"error\": \"Invalid credentials\"}");
+                return ResponseEntity.status(401)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"error\": \"Invalid credentials\"}");
             }
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(401).body("{\"error\": \"Invalid credentials\"}");
+            return ResponseEntity.status(401)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"error\": \"Invalid credentials\"}");
         }
     }
 
