@@ -64,6 +64,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(authorize -> authorize
                 .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .requestMatchers("/", "/index", "/css/**", "/images/**").permitAll()
                 .requestMatchers("/login", "/api/login").permitAll()
