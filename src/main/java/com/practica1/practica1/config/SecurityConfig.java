@@ -3,6 +3,7 @@ package com.practica1.practica1.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -62,11 +63,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
+                .requestMatchers("/api/**").authenticated()
                 .requestMatchers("/", "/index", "/css/**", "/images/**").permitAll()
                 .requestMatchers("/login", "/api/login").permitAll()
-                .requestMatchers("/products", "/api/products/**", "/cart/**").permitAll()
-                .requestMatchers("/api/products/**").permitAll()
-                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/products", "/cart/**").permitAll()
                 .requestMatchers("/admin/**", "/products/add", "/products/edit/**", "/products/delete/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
