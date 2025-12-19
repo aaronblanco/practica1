@@ -63,12 +63,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
+                // Endpoints públicos primero, para que no los capture la regla /api/**
+                .requestMatchers("/login", "/api/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/orders").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                // API protegida por defecto
                 .requestMatchers("/api/**").authenticated()
+                // Recursos públicos
                 .requestMatchers("/", "/index", "/css/**", "/images/**").permitAll()
-                .requestMatchers("/login", "/api/login").permitAll()
                 .requestMatchers("/products", "/cart/**").permitAll()
+                // Admin
                 .requestMatchers("/admin/**", "/products/add", "/products/edit/**", "/products/delete/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 )
