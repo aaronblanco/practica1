@@ -5,7 +5,7 @@ services:
     repo: aaronblanco/practica1
     branch: main
   build_command: ./mvnw clean package -DskipTests
-  run_command: java -Dserver.port=${PORT:-8080} -jar target/*.war
+  run_command: java -Dserver.port=${PORT:-8080} -jar target/*.jar
   http_port: 8080
   health_check:
     http_path: /products
